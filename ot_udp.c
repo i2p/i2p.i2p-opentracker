@@ -117,7 +117,7 @@ void handle_udp4( int64 serversocket ) {
         if( !torrent )
           return; /* XXX maybe send error */
 
-        r = 8 + return_peers_for_torrent( hash, numwant, static_outbuf + 8, 0 );
+        r = 8 + return_peers_for_torrent( NULL, hash, numwant, static_outbuf + 8, 0 );
       }
 
       socket_send4( serversocket, static_outbuf, r, remoteip, remoteport );

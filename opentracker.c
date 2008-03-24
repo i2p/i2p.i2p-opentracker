@@ -195,8 +195,10 @@ static void server_mainloop( ) {
       const void *cookie = io_getcookie( i );
       if( cookie == FLAG_TCP )
         handle_accept( i );
+#ifdef WANT_UDP
       else if( cookie == FLAG_UDP )
         handle_udp4( i );
+#endif
       else
         handle_read( i );
     }
@@ -243,7 +245,7 @@ static void ot_try_bind( char ip[4], uint16 port, int is_tcp ) {
 
 int main( int argc, char **argv ) {
   struct passwd *pws = NULL;
-  char serverip[4] = {0,0,0,0}, tmpip[4];
+  char serverip[4] = {127,0,0,1}, tmpip[4];
   char *serverdir = ".";
   int bound = 0, scanon = 1;
 #ifdef WANT_ACCESS_CONTROL
@@ -283,7 +285,9 @@ int main( int argc, char **argv ) {
   /* Bind to our default tcp/udp ports */
   if( !bound) {
     ot_try_bind( serverip, 6969, 1 );
+#ifdef WANT_UDP
     ot_try_bind( serverip, 6969, 0 );
+#endif
   }
 
   /* Drop permissions */

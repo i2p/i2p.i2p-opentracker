@@ -42,9 +42,9 @@ enum {
   SUCCESS_HTTP_SIZE_OFF = 17 };
 
 /* Our static output buffer */
-static char static_outbuf[8192];
+static char static_outbuf[32768];
 #ifdef _DEBUG_HTTPERROR
-static char debug_request[8192];
+static char debug_request[32768];
 #endif
 
 static void http_senddata( const int64 client_socket, char *buffer, size_t size ) {
@@ -407,10 +407,13 @@ static ssize_t http_handle_announce( const int64 client_socket, char *data ) {
     ++c;
   }
 
+  /* unused in i2p */
+  /*
   OT_SETIP( &peer, ((struct http_data*)io_getcookie( client_socket ) )->ip );
+   */
   OT_SETPORT( &peer, &port );
   OT_FLAG( &peer ) = 0;
-  numwant = 50;
+  numwant = OT_NUMWANT_DEFAULT;
   scanon = 1;
 
   while( scanon ) {
@@ -421,10 +424,9 @@ static ssize_t http_handle_announce( const int64 client_socket, char *data ) {
 #ifdef WANT_IP_FROM_QUERY_STRING
     case 2:
       if(!byte_diff(data,2,"ip")) {
-        unsigned char ip[4];
         len = scan_urlencoded_query( &c, data = c, SCAN_SEARCHPATH_VALUE );
-        if( ( len <= 0 ) || scan_fixed_ip( data, len, ip ) ) HTTPERROR_400_PARAM;
-        OT_SETIP( &peer, ip );
+        if( len != OT_DEST_SIZE ) HTTPERROR_400_PARAM;
+        OT_SETDEST( &peer, data );
      } else
         scan_urlencoded_skipvalue( &c );
      break;
@@ -460,12 +462,16 @@ static ssize_t http_handle_announce( const int64 client_socket, char *data ) {
       if(!byte_diff(data,7,"numwant")) {
         len = scan_urlencoded_query( &c, data = c, SCAN_SEARCHPATH_VALUE );
         if( ( len <= 0 ) || scan_fixed_int( data, len, &numwant ) ) HTTPERROR_400_PARAM;
-        if( numwant < 0 ) numwant = 50;
-        if( numwant > 200 ) numwant = 200;
+        if( numwant < 0 ) numwant = OT_NUMWANT_DEFAULT;
+        if( numwant > OT_NUMWANT_MAX ) numwant = OT_NUMWANT_MAX;
       } else if(!byte_diff(data,7,"compact")) {
         len = scan_urlencoded_query( &c, data = c, SCAN_SEARCHPATH_VALUE );
         if( ( len <= 0 ) || scan_fixed_int( data, len, &tmp ) ) HTTPERROR_400_PARAM;
         if( !tmp ) HTTPERROR_400_COMPACT;
+      } else if(!byte_diff(data,2,"peer_id")) {
+        len = scan_urlencoded_query( &c, data = c, SCAN_SEARCHPATH_VALUE );
+        if( len != OT_ID_SIZE ) HTTPERROR_400_PARAM;
+        OT_SETID( &peer, data );
       } else
         scan_urlencoded_skipvalue( &c );
       break;
@@ -489,7 +495,7 @@ static ssize_t http_handle_announce( const int64 client_socket, char *data ) {
     len = remove_peer_from_torrent( hash, &peer, SUCCESS_HTTP_HEADER_LENGTH + static_outbuf, 1 );
   else {
     torrent = add_peer_to_torrent( hash, &peer, 0 );
-    if( !torrent || !( len = return_peers_for_torrent( hash, numwant, SUCCESS_HTTP_HEADER_LENGTH + static_outbuf, 1 ) ) ) HTTPERROR_500;
+    if( !torrent || !( len = return_peers_for_torrent( &peer, hash, numwant, SUCCESS_HTTP_HEADER_LENGTH + static_outbuf, 1 ) ) ) HTTPERROR_500;
   }
   stats_issue_event( EVENT_ANNOUNCE, 1, len);
   return len;

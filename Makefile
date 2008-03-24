@@ -23,20 +23,28 @@ BINDIR?=$(PREFIX)/bin
 #FEATURES+=-DWANT_BLACKLISTING
 #FEATURES+=-DWANT_CLOSED_TRACKER
 #FEATURES+=-DWANT_UTORRENT1600_WORKAROUND
-#FEATURES+=-DWANT_IP_FROM_QUERY_STRING
+# Required for i2p
+FEATURES+=-DWANT_IP_FROM_QUERY_STRING
 #FEATURES+=-DWANT_COMPRESSION_GZIP 
 #FEATURES+=-DWANT_LOG_NETWORKS
 #FEATURES+=-D_DEBUG_HTTPERROR
+# undef to get fullscrape logs to stdout
+FEATURES+=-DNO_FULLSCRAPE_LOGGING
 
 OPTS_debug=-g -ggdb #-pg # -fprofile-arcs -ftest-coverage
 OPTS_production=-Os
 
-CFLAGS+=-I$(LIBOWFAT_HEADERS) -Wall -pipe -Wextra #-pedantic -ansi
+CFLAGS+=-I$(LIBOWFAT_HEADERS) -Wall -pipe #-Wextra -pedantic -ansi
 LDFLAGS+=-L$(LIBOWFAT_LIBRARY) -lowfat -pthread -lz
 
 BINARY =opentracker
-HEADERS=trackerlogic.h scan_urlencoded_query.h ot_mutex.h ot_stats.h ot_sync.h ot_vector.h ot_clean.h ot_udp.h ot_iovec.h ot_fullscrape.h ot_accesslist.h ot_http.h
-SOURCES=opentracker.c trackerlogic.c scan_urlencoded_query.c ot_mutex.c ot_stats.c ot_sync.c ot_vector.c ot_clean.c ot_udp.c ot_iovec.c ot_fullscrape.c ot_accesslist.c ot_http.c
+HEADERS=trackerlogic.h scan_urlencoded_query.h ot_mutex.h ot_stats.h ot_sync.h ot_vector.h ot_clean.h ot_iovec.h ot_fullscrape.h ot_accesslist.h ot_http.h
+SOURCES=opentracker.c trackerlogic.c scan_urlencoded_query.c ot_mutex.c ot_stats.c ot_sync.c ot_vector.c ot_clean.c ot_iovec.c ot_fullscrape.c ot_accesslist.c ot_http.c
+
+# UDP turned off for i2p
+#FEATURES+=-DWANT_UDP
+#HEADERS+=ot_udp.h
+#SOURCES+=ot_udp.c
 
 OBJECTS = $(SOURCES:%.c=%.o)
 OBJECTS_debug = $(SOURCES:%.c=%.debug.o)

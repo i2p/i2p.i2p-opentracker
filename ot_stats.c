@@ -446,9 +446,17 @@ extern const char
 *g_version_scan_urlencoded_query_c, *g_version_trackerlogic_c;
 
 size_t stats_return_tracker_version( char *reply ) {
-  return sprintf( reply, "%s%s%s%s%s%s%s%s%s%s%s%s%s",
+  return sprintf( reply, "%s%s%s%s%s%s%s%s%s%s%s%s"
+#ifdef WANT_UDP
+     "%s"
+#endif
+,
   g_version_opentracker_c, g_version_accesslist_c, g_version_clean_c, g_version_fullscrape_c, g_version_http_c,
-  g_version_iovec_c, g_version_mutex_c, g_version_stats_c, g_version_sync_c, g_version_udp_c, g_version_vector_c,
+  g_version_iovec_c, g_version_mutex_c, g_version_stats_c, g_version_sync_c,
+#ifdef WANT_UDP
+  g_version_udp_c,
+#endif
+  g_version_vector_c,
   g_version_scan_urlencoded_query_c, g_version_trackerlogic_c );
 }
 

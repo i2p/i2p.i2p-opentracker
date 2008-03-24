@@ -143,12 +143,14 @@ ot_torrent *add_peer_to_torrent( ot_hash *hash, ot_peer *peer  WANT_TRACKER_SYNC
 }
 
 /* Compiles a list of random peers for a torrent
-   * reply must have enough space to hold 92+6*amount bytes
+   * reply must have enough space to hold about 100+580*amount bytes
    * Selector function can be anything, maybe test for seeds, etc.
    * RANDOM may return huge values
    * does not yet check not to return self
+   ** Check that, i2psnark won't like it, so pass in the address of the
+   ** peer doing the request, and exclude him (if non-null).
 */
-size_t return_peers_for_torrent( ot_hash *hash, size_t amount, char *reply, int is_tcp ) {
+size_t return_peers_for_torrent( ot_peer *peer, ot_hash *hash, size_t amount, char *reply, int is_tcp ) {
   char        *r = reply;
   int          exactmatch;
   ot_vector   *torrents_list = mutex_bucket_lock_by_hash( hash );
@@ -161,11 +163,15 @@ size_t return_peers_for_torrent( ot_hash *hash, size_t amount, char *reply, int 
     return 0;
   }
 
-  if( peer_list->peer_count < amount )
-    amount = peer_list->peer_count;
+  /* subtract one, assume the requesting peer is in there (since we just added him) */
+  if( peer_list->peer_count - 1 < amount )
+    amount = peer_list->peer_count - 1;
+  if(amount < 0)
+    amount = 0;
 
+  /* return the peers as a list of dictionaries */
   if( is_tcp )
-    r += sprintf( r, "d8:completei%zde10:incompletei%zde8:intervali%ie5:peers%zd:", peer_list->seed_count, peer_list->peer_count-peer_list->seed_count, OT_CLIENT_REQUEST_INTERVAL_RANDOM, 6*amount );
+    r += sprintf( r, "d8:completei%zde10:incompletei%zde8:intervali%ie5:peersl", peer_list->seed_count, peer_list->peer_count-peer_list->seed_count, OT_CLIENT_REQUEST_INTERVAL_RANDOM);
   else {
     *(uint32_t*)(r+0) = htonl( OT_CLIENT_REQUEST_INTERVAL_RANDOM );
     *(uint32_t*)(r+4) = htonl( peer_list->peer_count );
@@ -178,6 +184,8 @@ size_t return_peers_for_torrent( ot_hash *hash, size_t amount, char *reply, int 
     unsigned int shifted_pc = peer_list->peer_count;
     unsigned int shifted_step = 0;
     unsigned int shift = 0;
+    unsigned int count = 0;
+    ot_peer *p;
 
     /* Make fixpoint arithmetic as exact as possible */
 #define MAXPRECBIT (1<<(8*sizeof(int)-3))
@@ -189,7 +197,7 @@ size_t return_peers_for_torrent( ot_hash *hash, size_t amount, char *reply, int 
        fixpoint's aliasing doesn't alway miss the same peers */
     pool_offset = random() % peer_list->peer_count;
 
-    for( index = 0; index < amount; ++index ) {
+    for( index = 0, count = 0; count < amount; ++index ) {
       /* This is the aliased, non shifted range, next value may fall into */
       unsigned int diff = ( ( ( index + 1 ) * shifted_step ) >> shift ) -
                           ( (   index       * shifted_step ) >> shift );
@@ -200,12 +208,25 @@ size_t return_peers_for_torrent( ot_hash *hash, size_t amount, char *reply, int 
         pool_index = ( pool_index + 1 ) % OT_POOLS_COUNT;
       }
 
-      memmove( r, ((ot_peer*)peer_list->peers[pool_index].data) + pool_offset, 6 );
-      r += 6;
+      p = ((ot_peer*)peer_list->peers[pool_index].data) + pool_offset;
+      if(peer != NULL && !byte_diff(peer, OT_PEER_COMPARE_SIZE, p))
+        continue;
+      count++;
+      /* ip=520 byte string, port=integer, peer id=20 byte string */
+      r += sprintf( r, "d2:ip%d:", OT_DEST_SIZE);
+      memmove( r, OT_DEST(p), OT_DEST_SIZE );
+      r += OT_DEST_SIZE;
+      r += sprintf( r, "4:porti%hde", ntohs(OT_PORT(p)));
+      r += sprintf( r, "7:peer id%d:", OT_ID_SIZE);
+      memmove( r, OT_ID(p), OT_ID_SIZE );
+      r += OT_ID_SIZE;
+      *r++ = 'e';
     }
   }
-  if( is_tcp )
+  if( is_tcp ) {
     *r++ = 'e';
+    *r++ = 'e';
+  }
 
   mutex_bucket_unlock_by_hash( hash );
   return r - reply;
