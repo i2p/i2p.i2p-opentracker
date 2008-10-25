@@ -216,10 +216,10 @@ size_t return_peers_for_torrent( ot_peer *peer, ot_hash *hash, size_t amount, ch
       r += sprintf( r, "d2:ip%d:", OT_DEST_SIZE);
       memmove( r, OT_DEST(p), OT_DEST_SIZE );
       r += OT_DEST_SIZE;
-      r += sprintf( r, "4:porti%hde", ntohs(OT_PORT(p)));
       r += sprintf( r, "7:peer id%d:", OT_ID_SIZE);
       memmove( r, OT_ID(p), OT_ID_SIZE );
       r += OT_ID_SIZE;
+      r += sprintf( r, "4:porti%hde", ntohs(OT_PORT(p)));
       *r++ = 'e';
     }
   }
