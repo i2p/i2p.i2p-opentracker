@@ -62,7 +62,8 @@ static void signal_handler( int s ) {
 }
 
 static void usage( char *name ) {
-  fprintf( stderr, "Usage: %s [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-A ip]"
+  //fprintf( stderr, "Usage: %s [-i ip] [-p port] [-P port] [-r redirect] [-d dir] [-A ip]"
+  fprintf( stderr, "Usage: %s [-i ip] [-p port] [-r redirect] [-d dir]"
 #ifdef WANT_BLACKLISTING
   " [-b blacklistfile]"
 #elif defined ( WANT_CLOSED_TRACKER )
@@ -71,23 +72,25 @@ static void usage( char *name ) {
   "\n", name );
 }
 
-#define HELPLINE(opt,desc) fprintf(stderr, "\t%-10s%s\n",opt,desc)
+#define HELPLINE(opt,desc) fprintf(stderr, "\t%-15s%s\n",opt,desc)
 static void help( char *name ) {
   usage( name );
 
   HELPLINE("-i ip","specify ip to bind to (default: *, you may specify more than one)");
   HELPLINE("-p port","specify tcp port to bind to (default: 6969, you may specify more than one)");
-  HELPLINE("-P port","specify udp port to bind to (default: 6969, you may specify more than one)");
+  /* Per README-i2p.txt, UDP support has been removed.
+  HELPLINE("-P port","specify udp port to bind to (default: 6969, you may specify more than one)"); */
   HELPLINE("-r redirecturl","specify url where / should be redirected to (default none)");
   HELPLINE("-d dir","specify directory to try to chroot to (default: \".\")");
-  HELPLINE("-A ip","bless an ip address as admin address (e.g. to allow syncs from this address)");
+  /* Per README-i2p.txt, syncing has been disabled
+  HELPLINE("-A ip","bless an ip address as admin address (e.g. to allow syncs from this address)"); */
 #ifdef WANT_BLACKLISTING
   HELPLINE("-b file","specify blacklist file.");
 #elif defined( WANT_CLOSED_TRACKER )
   HELPLINE("-w file","specify whitelist file.");
 #endif
 
-  fprintf( stderr, "\nExample:   ./opentracker -i 127.0.0.1 -p 6969 -P 6969 -i 10.1.1.23 -p 2710 -p 80\n" );
+  fprintf( stderr, "\nExample:   ./opentracker -i 127.0.0.1 -p 6969 -i 10.1.1.23 -p 2710 -p 80\n" );
 }
 #undef HELPLINE
 
