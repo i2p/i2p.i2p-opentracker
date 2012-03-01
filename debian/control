@@ -1,0 +1,16 @@
+Source: i2p-opentracker
+Section: net
+Priority: extra
+Maintainer: Kill Your TV <killyourtv@i2pmail.org>
+Build-Depends: debhelper (>= 8.0.0), libowfat-dev, zlib1g-dev
+Standards-Version: 3.9.3
+Vcs-Mtn: mtn://mtn.i2p2.de/i2p.i2p-opentracker
+
+Package: i2p-opentracker
+Architecture: any
+Depends: lsb-base (>= 3.0-6), ${shlibs:Depends}, ${misc:Depends}
+Suggests: i2p|i2p-router, robert
+Description: Open bittorrent tracker
+ This is a version of OpenTracker
+ (http://erdgeist.org/arts/software/opentracker/) that has been patched for use
+ on the I2P network.

@@ -28,10 +28,10 @@ See README or just do:
 	cd ../i2p.i2p-opentracker
 	make
 
-Debian/Ubuntu users can build the opentracker with the following:
-	apt-get install libowfat-dev zlib1g-dev build-essential
+Debian/Ubuntu users can build an opentracker package with the following:
+	apt-get install libowfat-dev zlib1g-dev build-essential fakeroot
 	cd i2p.i2p-opentracker
-	make
+	dpkg-buildpackage -B -uc -us
 
 RUNNING
 -------

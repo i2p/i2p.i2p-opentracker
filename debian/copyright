@@ -1,0 +1,9 @@
+Format: http://dep.debian.net/deps/dep5
+Upstream-Name: i2p-opentracker
+Source: mtn://mtn.i2p2.de?i2p.i2p.opentracker
+
+Files: *
+Copyright: Dirk Engling <erdgeist@erdgeist.org>
+License: public domain / Beerware
+ This software was written by Dirk Engling <erdgeist@erdgeist.org>
+ It is considered beerware. Prost. Skol. Cheers or whatever.

@@ -1,0 +1,12 @@
+i2p-opentracker (0.1~200803-2) unstable; urgency=low
+
+  * Removed disabled options from the -help output and the manpage
+  * Fixed debian/copyright
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 01 Mar 2012 11:23:50 +0000
+
+i2p-opentracker (0.1~200803-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 25 Feb 2012 20:20:45 +0000

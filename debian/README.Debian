@@ -1,0 +1,9 @@
+i2p-opentracker for Debian
+--------------------------
+
+This package changes the binary's name to i2p-opentracker so it doesn't
+conflict with the opentracker package. Everything else in README-i2p.txt
+applies to this package.
+
+ -- Kill Your TV <killyourtv@i2pmail.org> Thu, 01 Mar 2012 16:43:36 +0000
+

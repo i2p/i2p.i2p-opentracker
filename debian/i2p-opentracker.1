@@ -1,0 +1,22 @@
+.TH USAGE: "1" "March 2012" "i2p-opentracker" "User Commands"
+.SH NAME
+i2p-opentracker \- an open torrent tracker for I2P
+.SH SYNOPSIS
+.B i2p-opentracker
+[\fI-i ip\fR] [\fI-p port\fR] [\fI-r redirect\fR] [\fI-d dir\fR]
+.SH DESCRIPTION
+.TP
+\fB\-i\fR ip
+specify ip to bind to (default: *, you may specify more than one)
+.TP
+\fB\-p\fR port
+specify tcp port to bind to (default: 6969, you may specify more than one)
+.TP
+\fB\-r\fR redirecturl
+specify url where / should be redirected to (default none)
+.TP
+\fB\-d\fR dir
+specify directory to try to chroot to (default: ".")
+.TP
+.SH EXAMPLE
+i2p-opentracker \fB\-i\fR 127.0.0.1 \fB\-p\fR 6969 \fB\-i\fR 10.1.1.23 \fB\-p\fR 2710 \fB\-p\fR 80
