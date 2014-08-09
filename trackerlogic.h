@@ -18,7 +18,7 @@ typedef time_t         ot_time;
 #define OT_CLIENT_TIMEOUT 60
 #define OT_CLIENT_TIMEOUT_CHECKINTERVAL 10
 #define OT_CLIENT_TIMEOUT_SEND (60*15)
-#define OT_CLIENT_REQUEST_INTERVAL (60*15)
+#define OT_CLIENT_REQUEST_INTERVAL (60*35)
 #define OT_CLIENT_REQUEST_VARIATION (60*6)
 
 #define OT_TORRENT_TIMEOUT_HOURS 24
@@ -53,10 +53,15 @@ typedef time_t         ot_time;
 extern time_t g_now;
 #define NOW              (g_now/OT_POOLS_TIMEOUT)
 
-/* total is 520 + 2 + 20 + 2 = 544 */
+/* total is 534 + 2 + 20 + 2 = 558 */
 /* 516 byte key + ".i2p" */
-#define OT_DEST_SIZE 520
-#define OT_DESTPORT_SIZE (OT_DEST_SIZE+2)
+/* P256, P384: 524 + 4 = 528; P521: 528 + 8 = 532 */
+/* Following are without null termination */
+#define MIN_OT_DEST_SIZE 516
+#define MAX_OT_DEST_SIZE 532
+/* add one for null terminated and one for 2-byte alignment */
+#define OT_DESTZ_SIZE (MAX_OT_DEST_SIZE+2)
+#define OT_DESTPORT_SIZE (OT_DESTZ_SIZE+2)
 #define OT_ID_SIZE 20
 #define OT_DESTPORTID_SIZE (OT_DESTPORT_SIZE+OT_ID_SIZE)
 #define OT_TOTAL_SIZE (OT_DESTPORTID_SIZE+2)
@@ -69,17 +74,20 @@ static const uint8_t PEER_FLAG_STOPPED   = 0x20;
 
 /* unused for i2p */
 #define OT_SETIP( peer, ip ) memmove((peer),(ip),4);
-/* overwrites IP */
-#define OT_SETDEST( peer, ip ) memmove((peer),(ip),OT_DEST_SIZE);
+/* overwrites IP , adds null terminator, bzero so compare works */
+#define OT_SETDEST( peer, ip, len ) memmove((peer),(ip),(len)); bzero((((uint8_t*) (peer)) + (len)), OT_DESTZ_SIZE - (len));
+/* null terminated */
 #define OT_DEST(peer) ((uint8_t*)(peer))
-#define OT_SETPORT( peer, port ) memmove(((uint8_t*)(peer))+OT_DEST_SIZE,(port),2);
-#define OT_PORT(peer) *((uint16_t*)(((uint8_t*)(peer)) + OT_DEST_SIZE))
+/* without null terminator */
+#define OT_DEST_LEN(peer) strlen((const char*)(peer))
+#define OT_SETPORT( peer, port ) memmove(((uint8_t*)(peer))+OT_DESTZ_SIZE,(port),2);
+#define OT_PORT(peer) *((uint16_t*)(((uint8_t*)(peer)) + OT_DESTZ_SIZE))
 #define OT_SETID( peer, id ) memmove(((uint8_t*)(peer))+OT_DESTPORT_SIZE,(id),OT_ID_SIZE);
 #define OT_ID(peer) (((uint8_t*)(peer)) + OT_DESTPORT_SIZE)
 #define OT_FLAG(peer) (((uint8_t*)(peer))[OT_DESTPORTID_SIZE])
 
 /* Port and ID are ignored, not used in comparisons */
-#define OT_PEER_COMPARE_SIZE ((size_t) OT_DEST_SIZE)
+#define OT_PEER_COMPARE_SIZE ((size_t) MAX_OT_DEST_SIZE)
 #define OT_HASH_COMPARE_SIZE (sizeof(ot_hash))
 
 struct ot_peerlist;

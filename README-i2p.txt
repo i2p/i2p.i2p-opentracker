@@ -47,6 +47,8 @@ RUNNING
 	Make a torrent in i2psnark (see below) and start it.
 	After it announces, verify with http://your-tracker-name.i2p/stats?mode=top5
 
+	See man page in debian/i2p-opentracker.1 for command line options.
+
 
 TESTED/UNTESTED
 ---------------
@@ -58,19 +60,20 @@ CHANGES FOR I2P
 ---------------
 Almost all the changes are in ot_http.c, trackerclient.h, and trackerclient.c.
 
-	- Changed IP storage from 4 bytes to 520 bytes (Base64 dest + ".i2p")
+	- Changed IP storage from 4 bytes to 534 bytes (Base64 dest + ".i2p")
 	- Store and return 20 byte peer_id since i2psnark checks for a match
 	- Check only the dest for a match, port and id are ignored for matching
-	- So the in-memory size is 544 bytes per peer, not 8.
+	- So the in-memory size is 558 bytes per peer, not 8.
 	- Rather than returning the (standard) list of dictionaries
 	  containing (peerid, ip, port) for each peer.
-	  opentracker returned a flat byte string of length 6*n.
-	  Maybe that's the usual practice elsewhere, but i2psnark expects the
+	  opentracker returned a flat byte string of length 6*n (compact format).
+	  I2psnark expects the non-compact format, a
 	  list of dictionaries. So fixed it up to do that. (trackerclient.c)
+	  An I2P compact format has since been defined but is unimplemented here.
 	- Don't deliver a peer's own dest to it (would hose i2psnark because it doesn't check)
 	- Increase output buffer size, reduce default and max numwant
 	- Changed default ip binding from 0.0.0.0 to 127.0.0.1
-	- Change interval from 30m with randomization to fixed 15m (i2psnark does randomization)
+	- Change interval from 30m with randomization to fixed 35m (i2psnark does randomization)
 	- Changed client timeout from 30s to 60s (I think)
 	- Disabled UDP and ifdef'ed it out, probably wasn't worth the effort though
 
@@ -105,3 +108,4 @@ POSSIBLE IMPROVEMENTS
 	  on the other hand, you could make a pretty html scrape output
 	  and make it be the 'home page'.
 	- 'make' doesn't seem to rebuild correctly if you change a .h file - do a 'make clean' first
+	- Add compact format support (needs base64 and sha256 library)

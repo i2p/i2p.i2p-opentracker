@@ -213,9 +213,11 @@ size_t return_peers_for_torrent( ot_peer *peer, ot_hash *hash, size_t amount, ch
         continue;
       count++;
       /* ip=520 byte string, port=integer, peer id=20 byte string */
-      r += sprintf( r, "d2:ip%d:", OT_DEST_SIZE);
-      memmove( r, OT_DEST(p), OT_DEST_SIZE );
-      r += OT_DEST_SIZE;
+      /* TODO add ".i2p" suffix if not present */
+      int iplen = OT_DEST_LEN(p);
+      r += sprintf( r, "d2:ip%d:", iplen);
+      memmove( r, OT_DEST(p), iplen );
+      r += iplen;
       r += sprintf( r, "7:peer id%d:", OT_ID_SIZE);
       memmove( r, OT_ID(p), OT_ID_SIZE );
       r += OT_ID_SIZE;

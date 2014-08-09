@@ -425,8 +425,8 @@ static ssize_t http_handle_announce( const int64 client_socket, char *data ) {
     case 2:
       if(!byte_diff(data,2,"ip")) {
         len = scan_urlencoded_query( &c, data = c, SCAN_SEARCHPATH_VALUE );
-        if( len != OT_DEST_SIZE ) HTTPERROR_400_PARAM;
-        OT_SETDEST( &peer, data );
+        if( len < MIN_OT_DEST_SIZE || len > MAX_OT_DEST_SIZE ) HTTPERROR_400_PARAM;
+        OT_SETDEST( &peer, data, len );
      } else
         scan_urlencoded_skipvalue( &c );
      break;

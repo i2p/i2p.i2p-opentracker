@@ -1,0 +1,13 @@
+0.3
+2014-08-09
+Support longer destinations for key certificates
+Don't require dest to end with ".i2p"
+Change interval from 15m to 35m (internal expiration remains at 45m)
+
+0.2
+2008-10-25
+Fix dictionary order
+
+0.1
+2008-03-24
+Initial release
