@@ -1,3 +1,9 @@
+====================================================
+This I2P fork is DEPRECATED.
+Please use https://github.com/r4sas/opentracker-i2p
+See README-i2p.txt for details.
+====================================================
+
 This is opentracker. An open bittorrent tracker.
 
 You need libowfat (http://www.fefe.de/libowfat/).

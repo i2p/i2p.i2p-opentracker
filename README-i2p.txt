@@ -1,3 +1,12 @@
+DEPRECATED
+----------
+This I2P fork is DEPRECATED as of 2023-11.
+Please use https://github.com/r4sas/opentracker-i2p
+which is rewritten and rebased on the latest (2021) opentracker code.
+R4SAS's version supports compact responses (only) which
+reduces memory and outbound bandwidth use by more than 90%
+compared to this version.
+
 =================================
 i2p-opentracker
 mods and notes by zzz March 2008
